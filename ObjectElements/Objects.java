@@ -19,10 +19,10 @@ public class Objects
 
         private char roomPrefix = '\n';
 
-        public Hotel(String name, int roomNumber, char cPrefix) {
+        public Hotel(String name, char cPrefix) {
             this.name = name;
             this.roomPrefix = cPrefix;
-            this.rooms[0] = new room(roomNumber, cPrefix);
+            this.rooms[0] = new room(dRooms, cPrefix);
             this.reservations[0] = null;
         }
         public String getName () {
@@ -92,7 +92,7 @@ public class Objects
             private boolean isAvailable = true;
 
             private room (int roomNumber, char cPrefix) {
-                this.roomNumber = String.format("%c%.3d", cPrefix, roomNumber);
+                this.roomNumber = String.format("%c%03d", cPrefix, roomNumber);
             }
             
             public String getRoomNumber () {

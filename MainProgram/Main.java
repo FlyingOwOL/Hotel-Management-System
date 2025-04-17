@@ -23,6 +23,7 @@ public class Main
             "5.Exit Program",
             "Number of your choice:");
             dMenuInput = userInput.nextInt();
+            userInput.nextLine(); // Consume the newline character left by nextInt()
             switch(dMenuInput)
             {
                 case 1:
