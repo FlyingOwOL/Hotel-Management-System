@@ -1,38 +1,50 @@
 package MainProgram;
+
+import ObjectElements.Objects;
+import MainMethods.MainMethods;
+import java.util.Scanner;
+import java.util.ArrayList;
+
 public class Main
 {
 	public static void main(String[] args) 
 	{
-	    int menuInput=2;
+        ArrayList <Objects.Hotel> hotels = new ArrayList <Objects.Hotel>();
+        MainMethods methods = new MainMethods();       
+	    Scanner userInput = new Scanner (System.in);
+        int dMenuInput;
 	    do{
-    		System.out.println("Select option:");
-    		System.out.println("1.Create Hotel");
-    		System.out.println("2.View Hotel");
-    		System.out.println("3.Manage Hotel");
-    		System.out.println("4.Book Room");
-    		System.out.println("5.Exit Program");
-            System.out.println("Number of your choice:");
-            switch(menuInput)
+            System.out.printf("%s\n%s\n%s\n%s\n%s\n%s\n%s",
+            "Select option:",
+            "1.Create Hotel",
+            "2.View Hotel",
+            "3.Manage Hotel",
+            "4.Book Room",
+            "5.Exit Program",
+            "Number of your choice:");
+            dMenuInput = userInput.nextInt();
+            switch(dMenuInput)
             {
                 case 1:
-                    System.out.println("Option has yet to be implemented");
+                    methods.createHotel(hotels, userInput);
                     break;
                 case 2:
-                    System.out.println("Option has yet to be implemented");
+                    methods.viewHotel(hotels, userInput);
                     break;
                 case 3:
-                    System.out.println("Option has yet to be implemented");
+                    methods.manageHotel(hotels, userInput);
                     break;
                 case 4:
-                    System.out.println("Option has yet to be implemented");
+                    methods.bookRoom(hotels, userInput);
                     break;
                 case 5:
                     System.out.println("Now exiting program");
                     break;
                 default:
-                    System.out.println("Invalid input");
+                    System.out.println("Out of range input");
                 
             }
-	    }while(menuInput!=5);
+	    }while(dMenuInput!=5);
+        userInput.close();
 	}
 }
