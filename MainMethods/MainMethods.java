@@ -18,6 +18,10 @@ public class MainMethods {
             if (isNotValid) {
                 System.out.println ("Hotel name already exists, please enter a different name");
             }
+            if (name.length() > 20) {
+                System.out.println ("Hotel name is too long, please enter a name with less than 20 characters");
+                isNotValid = true;
+            }
         } while (isNotValid);
         do{            
             System.out.print ("Enter Hotel room prefix (e.g A, B, C): ");
@@ -31,7 +35,35 @@ public class MainMethods {
     }
 
     public void viewHotel (ArrayList <Objects.Hotel> hotels, Scanner userInput){
-
+        int dChoice = 0;
+        double dTotalEarning = 0;
+        int dTotalRooms = 0;
+        do{
+            System.out.println ("Select a hotel to view more details:");
+            System.out.printf ("%3s +----- %10s -----+ %5s + %17s\n", "No.", "Hotel Name", "Rooms", "Estimated Earning");
+            for (int i = 0; i < hotels.size(); i++){
+                System.out.printf ("%2d. | %20s | %3d   | %.2f\n", 
+                i + 1,  
+                hotels.get(i).getName(), 
+                hotels.get(i).getTotalRooms(),
+                hotels.get(i).getEstimateEarning());
+                dTotalEarning += hotels.get(i).getEstimateEarning();
+                dTotalRooms += hotels.get(i).getTotalRooms();
+            }
+            System.out.println ("----+----------------------+-------+-----------------");
+            System.out.printf ("Total:       %3d           | %3d   | %.2f\n",hotels.size(), dTotalRooms, dTotalEarning);
+            System.out.println ("----+----------------------+-------+-----------------");
+            System.out.println (" 0. Exit to main menu");
+            System.out.print ("Enter your choice: ");
+            dChoice = userInput.nextInt();
+            userInput.nextLine(); // Consume the newline character
+            if (dChoice > 0 && dChoice <= hotels.size()){
+                AssistMethods.hotelSelection(hotels.get(dChoice - 1), userInput);
+            } else {
+                System.out.println ("Out of range option");
+            }
+        } while (dChoice != 0);
+        System.out.println ("Returning to main menu");
     }
 
     public void manageHotel (ArrayList <Objects.Hotel> hotels, Scanner userInput){

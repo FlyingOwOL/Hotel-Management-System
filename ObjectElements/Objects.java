@@ -1,5 +1,7 @@
 package ObjectElements;
 
+import MainProgram.AssistMethods;
+
 public class Objects 
 {
     public static class constants   //definitions of constants
@@ -16,6 +18,11 @@ public class Objects
         public double basePrice = 1299;
         private reservation[] reservations = new reservation[constants.MAX_RESERVATIONS];
         private int dReservations = 0;
+        private double estimateEarning = 0.0;
+        private room[] availableRooms = new room[constants.MAX_ROOMS];
+        private int dAvailableRooms = 0;
+        private room[] bookedRooms = new room[constants.MAX_ROOMS];
+        private int dBookedRooms = 0;
 
         private char roomPrefix = '\n';
 
@@ -24,6 +31,10 @@ public class Objects
             this.roomPrefix = cPrefix;
             this.rooms[0] = new room(dRooms, cPrefix);
             this.reservations[0] = null;
+            this.dAvailableRooms = 1;
+        }
+        public double getEstimateEarning () {
+            return estimateEarning;
         }
         public String getName () {
             return name;
@@ -47,6 +58,10 @@ public class Objects
                 reservations[dIndex] = new reservation(name, roomNumber, checkInDate, checkOutDate, basePrice);
                 rooms[dIndex].addReservation(name, checkInDate, checkOutDate, basePrice);
                 System.out.printf ("Reservation for %s has been added\n", name);
+                this.estimateEarning += rooms[dIndex].getReservationTotalAmount();
+                this.bookedRooms[dIndex] = rooms[dIndex];
+                this.dBookedRooms++;
+                this.availableRooms[dIndex] = null;
             } else {
                 System.out.printf("Maximum number of reservations reached for %s\n", name);
             }
@@ -57,8 +72,56 @@ public class Objects
                 int dIndex = Integer.parseInt(roomNumber.substring(1)) - 1;
                 reservations[dIndex] = null;
                 System.out.printf ("Reservation for %s has been removed\n", name);
+                this.bookedRooms[dIndex] = null;
+                this.dBookedRooms--;
+                this.availableRooms[dIndex] = rooms[dIndex];
+                this.dAvailableRooms++;
             } else {
                 System.out.printf("Minimum number of reservations reached for %s\n", name);
+            }
+        }
+        public int dateBookedRooms(String checkInDate, String checkOutDate) { // format MM/DD/YYYY
+            int bookedCount = 0;
+        
+            for (int i = 0; i < dRooms; i++) {
+                if (!rooms[i].isAvailable()) {
+                    String roomCheckIn = rooms[i].getReservationCheckInDate();
+                    String roomCheckOut = rooms[i].getReservationCheckOutDate();
+        
+                    // Convert all dates to comparable values (e.g. YYYYMMDD)
+                    int paramStart = AssistMethods.convertToComparableDate(checkInDate);
+                    int paramEnd = AssistMethods.convertToComparableDate(checkOutDate);
+                    int roomStart = AssistMethods.convertToComparableDate(roomCheckIn);
+                    int roomEnd = AssistMethods.convertToComparableDate(roomCheckOut);
+        
+                    // Check if there is any overlap between the room's booking and the given date range
+                    if (roomEnd >= paramStart && roomStart <= paramEnd) {
+                        bookedCount++;
+                    }
+                }
+            }
+            return bookedCount;
+        }
+        public int getTotaldAvailableRooms () {
+            return dAvailableRooms;
+        }
+        public int getTotaldBookedRooms () {
+            return dBookedRooms;
+        }
+        public void viewRoomInfo (String roomNumber, String Month) { // Month is spelled out
+            int dIndex = Integer.parseInt(roomNumber.substring(1)) - 1;
+            String availability = rooms[dIndex].isAvailable() ? "available this" + Month : "not available on ";
+            String reservedDate = rooms[dIndex].getReservationCheckInDate() + " - " + rooms[dIndex].getReservationCheckOutDate();
+            String reservationDate = rooms[dIndex].isAvailable() ? " " : reservedDate;
+            System.out.printf ("Room %s is %s %s\n", 
+            rooms[dIndex].getRoomNumber(), 
+            availability, 
+            reservationDate);
+            if (!rooms[dIndex].isAvailable()) {
+                System.out.printf ("Reservation name: %s\n", rooms[dIndex].getReservationName());
+                System.out.printf ("Check-in date: %s\n", rooms[dIndex].getReservationCheckInDate());
+                System.out.printf ("Check-out date: %s\n", rooms[dIndex].getReservationCheckOutDate());
+                System.out.printf ("Total amount: %.2f\n", rooms[dIndex].getReservationTotalAmount());
             }
         }
         public void addRoom (int dIndex){
@@ -83,7 +146,9 @@ public class Objects
         public int getTotalRooms () {
             return dRooms;
         }
-
+        public String getRoomNumber (int dIndex) {
+            return rooms[dIndex - 1].getRoomNumber();
+        }
 
         private class room
         {
