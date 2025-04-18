@@ -29,7 +29,7 @@ public class Objects
         public Hotel(String name, char cPrefix) {
             this.name = name;
             this.roomPrefix = cPrefix;
-            this.rooms[0] = new room(dRooms, cPrefix);
+            this.rooms[0] = new room(dRooms, cPrefix, basePrice);
             this.reservations[0] = null;
             this.dAvailableRooms = 1;
         }
@@ -72,7 +72,7 @@ public class Objects
                 System.out.printf("Maximum number of reservations reached for %s\n", name);
             }
         }
-        public void removeReservation (String name, String roomNumber, String checkInDate, String checkOutDate) {
+        public void removeReservation (String name, String roomNumber) {
             if (dReservations > 0) {
                 dReservations--;
                 int dIndex = Integer.parseInt(roomNumber.substring(1)) - 1;
@@ -83,7 +83,7 @@ public class Objects
                 this.availableRooms[dIndex] = rooms[dIndex];
                 this.dAvailableRooms++;
             } else {
-                System.out.printf("Minimum number of reservations reached for %s\n", name);
+                System.out.printf("Room %s or reservation for %s not found\n", roomNumber, name);
             }
         }
         public int dateBookedRooms(String checkInDate, String checkOutDate) { // format MM/DD/YYYY
@@ -142,7 +142,7 @@ public class Objects
         public void addRoom (){
             if (dRooms < constants.MAX_ROOMS) {
                 dRooms++;
-                rooms[dRooms] = new room(dRooms, roomPrefix);
+                rooms[dRooms] = new room(dRooms, roomPrefix, 1299);
                 System.out.printf ("Room %s has been added\n", rooms[dRooms].getRoomNumber());
             } else {
                 System.out.printf("Maximum number of rooms reached for %s\n", name);
@@ -163,6 +163,19 @@ public class Objects
                 System.out.printf("Minimum number of rooms reached for %s\n", name);
             }
         }
+        public void changeRoomPrice (String roomNumber, double newBasePrice) {
+            int dIndex = Integer.parseInt(roomNumber.substring(1)) - 1;
+            if (rooms[dIndex].isAvailable) {
+                if (newBasePrice >= 100) {
+                    rooms[dIndex].setBasePrice(newBasePrice);
+                    System.out.printf ("Room %s price has been changed to %.2f\n", roomNumber, rooms[dIndex].getBasePrice());
+                } else {
+                    System.out.printf ("Invalid price for room %s\n", roomNumber);
+                }
+            } else {
+                System.out.printf ("Room %s is currently being used\n", roomNumber);
+            }
+        }
         public int getTotalRooms () {
             return dRooms;
         }
@@ -174,12 +187,19 @@ public class Objects
         {
             private String roomNumber;
             private reservation reservation;
+            private double basePrice;
             private boolean isAvailable = true;
 
-            private room (int roomNumber, char cPrefix) {
+            private room (int roomNumber, char cPrefix, double basePrice) {
                 this.roomNumber = String.format("%c%03d", cPrefix, roomNumber);
+                this.basePrice = basePrice;
             }
-            
+            public double getBasePrice () {
+                return basePrice;
+            }
+            public void setBasePrice (double basePrice) {
+                this.basePrice = basePrice;
+            }
             public String getRoomNumber () {
                 return roomNumber;
             }

@@ -140,21 +140,35 @@ public class AssistMethods {
                     hotel.removeRoom(roomNumber);
                     break;
                 case 4:
-                    /*System.out.printf ("Hotel %s room:\n", hotel.getName());
+                    System.out.printf ("Hotel %s room:\n", hotel.getName());
                     for (int i = 0; i < hotel.getTotalRooms(); i++) {
                         System.out.printf ("%d. %s\n", i + 1, hotel.getRoomNumber(i));
                     }
                     System.out.print("Enter room number (e.g., A001): ");
-                    String roomNumber = userInput.nextLine();
-                    System.out.print("Enter month (e.g., January): ");
-                    String month = userInput.nextLine(); //Spelled out
-                    hotel.viewRoomInfo(roomNumber, month); */
+                    String room = userInput.nextLine();
+                    System.out.print("Enter new base price: ");
+                    double basePrice = userInput.nextDouble();
+                    userInput.nextLine(); // Consume the newline character left by nextInt()
+                    hotel.changeRoomPrice(room, basePrice); 
                     break;
                 case 5:
-
+                    System.out.printf ("Hotel %s reservation:\n", hotel.getName());
+                    for (int i = 0; i < hotel.getTotaldReservations(); i++) {
+                        System.out.printf ("%d. %s\n", i + 1, hotel.viewReservation(i));
+                    }
+                    System.out.print ("Enter room number (e.g., A001): ");
+                    String roomNumber2 = userInput.nextLine();
+                    System.out.print ("Enter name:");
+                    String name = userInput.nextLine();
+                    hotel.removeReservation(name, roomNumber2);
                     break;
                 case 6:
-
+                    if (hotel.getTotaldBookedRooms() > 0){
+                        System.out.println ("There are still booked rooms in this hotel");
+                    } else {
+                        hotels.remove(hotel);
+                        System.out.printf ("Hotel %s has been removed\n", hotel.getName());
+                    }
                     break;
                 default:
             }  
