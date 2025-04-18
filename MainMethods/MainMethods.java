@@ -67,7 +67,27 @@ public class MainMethods {
     }
 
     public void manageHotel (ArrayList <Objects.Hotel> hotels, Scanner userInput){
-
+        int dChoice = 0;
+        do{
+            System.out.println ("Select a hotel to manage:");
+            System.out.printf ("%3s +----- %10s -----+\n", "No.", "Hotel Name");
+            for (int i = 0; i < hotels.size(); i++){
+                System.out.printf ("%2d. | %20s |\n", 
+                i + 1,  
+                hotels.get(i).getName());
+            }
+            System.out.println ("----+----------------------+");
+            System.out.println (" 0. Exit to main menu");
+            System.out.print ("Enter your choice: ");
+            dChoice = userInput.nextInt();
+            userInput.nextLine(); // Consume the newline character
+            if (dChoice > 0 && dChoice <= hotels.size()){
+                AssistMethods.manipulateHotel (hotels, hotels.get(dChoice - 1), userInput);
+            } else {
+                System.out.println ("Out of range option");
+            }
+        } while (dChoice != 0);
+        System.out.println ("Returning to main menu");
     }
 
     public void bookRoom (ArrayList <Objects.Hotel> hotels, Scanner userInput){

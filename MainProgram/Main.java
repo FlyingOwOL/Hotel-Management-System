@@ -30,13 +30,25 @@ public class Main
                     methods.createHotel(hotels, userInput);
                     break;
                 case 2:
-                    methods.viewHotel(hotels, userInput);
+                    if (hotels.isEmpty()){
+                        System.out.println("No hotels available to view, please create a hotel first");
+                    } else {
+                        methods.viewHotel(hotels, userInput);
+                    }
                     break;
                 case 3:
-                    methods.manageHotel(hotels, userInput);
+                    if (hotels.isEmpty()){
+                        System.out.println("No hotels available to manage, please create a hotel first");
+                    } else {
+                        methods.manageHotel(hotels, userInput);
+                    }
                     break;
                 case 4:
-                    methods.bookRoom(hotels, userInput);
+                    if (hotels.isEmpty()){
+                        System.out.println("No hotels available to book, please create a hotel first");
+                    } else {
+                        methods.bookRoom(hotels, userInput);
+                    }
                     break;
                 case 5:
                     System.out.println("Now exiting program");

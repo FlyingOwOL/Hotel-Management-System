@@ -51,6 +51,12 @@ public class Objects
         public int getTotaldReservations () {
             return dReservations;
         }
+        public String viewReservation (int dIndex){
+            String reservation = String.format("Reservation for %s at room %s",
+            reservations[dIndex].getName(),
+            reservations[dIndex].getRoomNumber());
+            return reservation;
+        }
         public void addReservation (String name, String roomNumber, String checkInDate, String checkOutDate) {
             if (dReservations < constants.MAX_RESERVATIONS) {
                 dReservations++;
@@ -110,13 +116,14 @@ public class Objects
         }
         public void viewRoomInfo (String roomNumber, String Month) { // Month is spelled out
             int dIndex = Integer.parseInt(roomNumber.substring(1)) - 1;
-            String availability = rooms[dIndex].isAvailable() ? "available this" + Month : "not available on ";
+            String availability = rooms[dIndex].isAvailable() ? "available this " + Month : "not available on ";
             String reservedDate = rooms[dIndex].getReservationCheckInDate() + " - " + rooms[dIndex].getReservationCheckOutDate();
             String reservationDate = rooms[dIndex].isAvailable() ? " " : reservedDate;
             System.out.printf ("Room %s is %s %s\n", 
             rooms[dIndex].getRoomNumber(), 
             availability, 
             reservationDate);
+            System.out.printf ("Price per night: ₱%.2f\n", basePrice);
             if (!rooms[dIndex].isAvailable()) {
                 System.out.printf ("Reservation name: %s\n", rooms[dIndex].getReservationName());
                 System.out.printf ("Check-in date: %s\n", rooms[dIndex].getReservationCheckInDate());
@@ -124,21 +131,34 @@ public class Objects
                 System.out.printf ("Total amount: %.2f\n", rooms[dIndex].getReservationTotalAmount());
             }
         }
-        public void addRoom (int dIndex){
+        public void viewReservationInfo (String roomNumber, String name) {
+            int dIndex = Integer.parseInt(roomNumber.substring(1)) - 1;
+            if (rooms[dIndex].getReservationName().equals(name)) {
+                viewRoomInfo(roomNumber,  "");
+            } else {
+                System.out.printf ("No reservation found for this room number %s or %s\n", roomNumber, name);
+            }
+        }
+        public void addRoom (){
             if (dRooms < constants.MAX_ROOMS) {
                 dRooms++;
-                rooms[dIndex] = new room(dRooms, roomPrefix);
-                System.out.printf ("Room %s has been added\n", rooms[dIndex].getRoomNumber());
+                rooms[dRooms] = new room(dRooms, roomPrefix);
+                System.out.printf ("Room %s has been added\n", rooms[dRooms].getRoomNumber());
             } else {
                 System.out.printf("Maximum number of rooms reached for %s\n", name);
             }
         }
         public void removeRoom (String roomNumber){
+            int dIndex = Integer.parseInt(roomNumber.substring(1)) - 1;            
+
             if (dRooms > 1) {
-                dRooms--;
-                int dIndex = Integer.parseInt(roomNumber.substring(1)) - 1;
-                rooms[dIndex] = null;
-                System.out.printf ("Room %s has been removed\n", roomNumber);
+                if (rooms[dIndex].isAvailable){
+                    dRooms--;
+                    rooms[dIndex] = null;
+                    System.out.printf ("Room %s has been removed\n", roomNumber);
+                } else {
+                    System.out.printf ("Room %s is currently being used\n", roomNumber);
+                }
             } else {
                 System.out.printf("Minimum number of rooms reached for %s\n", name);
             }
@@ -147,7 +167,7 @@ public class Objects
             return dRooms;
         }
         public String getRoomNumber (int dIndex) {
-            return rooms[dIndex - 1].getRoomNumber();
+            return rooms[dIndex].getRoomNumber();
         }
 
         private class room
@@ -172,9 +192,6 @@ public class Objects
             }
             public String getReservationName () {
                 return reservation != null ? reservation.getName() : null;
-            }
-            public String getReservationRoomNumber () {
-                return reservation != null ? reservation.getRoomNumber() : null;
             }
             public String getReservationCheckInDate () {
                 return reservation != null ? reservation.getCheckInDate() : null;
