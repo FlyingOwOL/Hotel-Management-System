@@ -1,6 +1,8 @@
 package MainProgram;
 
 import ObjectElements.Objects;
+import ObjectElements.Objects.constants;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -16,11 +18,30 @@ public class AssistMethods {
     public static boolean isExistingHotel (ArrayList <Objects.Hotel> hotels, String name) {
         boolean isFound = false;
         for (int i = 0; i < hotels.size() && !isFound; i++) {
-            if (hotels.get(i).getName().equals(name)) {
+            if (name == null){
+                isFound = false;
+            } else if (hotels.get(i).getName().equals(name)) {
                 isFound = true;
             }
         }
         return isFound;
+    }
+    public static boolean isValidDate (String date){
+        boolean isValid = false;
+        String[] parts = date.split("/");
+        if (parts.length == 3) {
+            int month = Integer.parseInt(parts[0]);
+            int day = Integer.parseInt(parts[1]);
+            int year = Integer.parseInt(parts[2]);
+            if (month >= 1 && month <= 12 && day >= 1 && day <= 31 && year > 0) {
+                isValid = true;
+            } else {
+                System.out.println("Invalid date, please enter a valid date in MM/DD/YYYY format");
+            }
+        } else {
+            System.out.println("Invalid date format, please enter a date in MM/DD/YYYY format");
+        }
+        return isValid;
     }
     public static boolean isValidPrefix (String prefix){
         boolean isValid = false;
@@ -36,6 +57,17 @@ public class AssistMethods {
         }
         return isValid;
     }
+    public static boolean isExistingRoom (Objects.Hotel hotel, String roomNumber){
+        boolean isValid = false;
+        for (int x = 0; x < hotel.getTotalRooms() && !isValid; x++){
+            if (roomNumber == null){
+                isValid = false;
+            } else if (hotel.getRoomNumber(x).equals(roomNumber)) {
+                isValid = true;
+            }
+        }
+        return isValid;
+    }
 
     public static void hotelSelection (Objects.Hotel hotel, Scanner userInput ){
         int dChoice = 0;
@@ -45,7 +77,7 @@ public class AssistMethods {
             "1. Total number of available rooms for selected date",
             "2. View room information",
             "3. View Reservation information",
-            "4. return to view hotel menu",
+            "0. return to view hotel menu",
             "Your choice: ");
             dChoice = userInput.nextInt();
             userInput.nextLine(); // Consume the newline character left by nextInt()  
@@ -84,12 +116,12 @@ public class AssistMethods {
                         hotel.viewReservationInfo(room, name);
                     }
                     break;
-                case 4:
+                case 0:
                     System.out.println("Returning to view hotel menu");
                     break;
                 default:
             }  
-        } while (dChoice != 4);
+        } while (dChoice != 0);
     }
 
     public static void manipulateHotel (ArrayList <Objects.Hotel> hotels, Objects.Hotel hotel, Scanner userInput) {
@@ -128,7 +160,28 @@ public class AssistMethods {
                     } while (isNotValid);
                     break;
                 case 2: 
-                    hotel.addRoom();
+                    boolean isValidLocation = false;
+                    int dIndex = 0;
+                    do{
+                        System.out.println ("Current rooms:");
+                        for (int i = 0; i < constants.MAX_ROOMS; i++) {
+                            if (AssistMethods.isExistingRoom(hotel, hotel.getRoomNumber(i))){
+                                System.out.printf ("%d. %s\n", i + 1, hotel.getRoomNumber(i));
+                            } else {
+                                System.out.printf ("%d. Empty\n", i + 1);
+                            }
+                        }
+                        System.out.printf("Select location to add room (1 - 50): ", hotel.getTotalRooms() + 1);
+                        dIndex = userInput.nextInt();
+                        if (dIndex < 1 || dIndex > 50) {
+                            System.out.println("Invalid location, please select a number between 1 and 50.");
+                        } else if (hotel.getRoomNumber(dIndex - 1) != null) {
+                            System.out.println("Room already exists in this location, please select another location.");
+                        } else {
+                            isValidLocation = true;
+                        }
+                    } while (!isValidLocation);
+                    hotel.addRoom(dIndex - 1);
                     break;
                 case 3:
                     System.out.printf ("Hotel %s room:\n", hotel.getName());
@@ -142,7 +195,9 @@ public class AssistMethods {
                 case 4:
                     System.out.printf ("Hotel %s room:\n", hotel.getName());
                     for (int i = 0; i < hotel.getTotalRooms(); i++) {
-                        System.out.printf ("%d. %s\n", i + 1, hotel.getRoomNumber(i));
+                        if (AssistMethods.isExistingRoom(hotel, hotel.getRoomNumber(i))){
+                            System.out.printf ("%d. %s\n", i + 1, hotel.getRoomNumber(i));
+                        }
                     }
                     System.out.print("Enter room number (e.g., A001): ");
                     String room = userInput.nextLine();
@@ -172,6 +227,46 @@ public class AssistMethods {
                     break;
                 default:
             }  
-        } while (dChoice != 0);
+        } while (dChoice != 0 && AssistMethods.isExistingHotel(hotels, hotel.getName()) != false);
+    }
+    
+    public static void makeReservation (Objects.Hotel hotel, Scanner userInput) {
+        String name = null;
+        String roomNumber = null;
+        String checkInDate = null;
+        String checkOutDate = null;
+        boolean isNotValid = false;
+        System.out.print ("Enter your name: ");
+        name = userInput.nextLine();
+        do{
+            System.out.println ("Current rooms:");
+            for (int i = 0; i < hotel.getTotalRooms(); i++) {
+                if (AssistMethods.isExistingRoom(hotel, hotel.getRoomNumber(i))){
+                    System.out.printf ("%d. %s\n", i + 1, hotel.getRoomNumber(i));
+                } else {
+                    System.out.printf ("%d. Empty\n", i + 1);
+                }
+            }
+            System.out.print ("Enter room number (e.g., A001): ");
+            roomNumber = userInput.nextLine();
+            isNotValid = isExistingRoom(hotel, roomNumber);
+            if (!isNotValid) {
+                System.out.println("Room does not exist");
+            } else if (!hotel.isRoomAvailable(roomNumber)){
+                System.out.println ("Room is booked, please select another room");
+                isNotValid = false;
+            }
+        } while (!isNotValid);
+        do{
+            System.out.print ("Enter start date (MM/DD/YYYY): ");
+            checkInDate = userInput.nextLine();
+            isNotValid = isValidDate(checkInDate);
+        } while (!isNotValid);
+        do{
+            System.out.print ("Enter end date (MM/DD/YYYY): ");
+            checkOutDate = userInput.nextLine();
+            isNotValid = isValidDate(checkOutDate);
+        } while (!isNotValid);
+        hotel.addReservation(name, roomNumber, checkInDate, checkOutDate);
     }
 }

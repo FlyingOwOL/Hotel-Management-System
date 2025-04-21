@@ -14,7 +14,7 @@ public class Objects
     {
         private String name;
         private room[] rooms = new room[constants.MAX_ROOMS];
-        private int dRooms = 1;
+        private int dRooms = 0;
         public double basePrice = 1299;
         private reservation[] reservations = new reservation[constants.MAX_RESERVATIONS];
         private int dReservations = 0;
@@ -31,7 +31,8 @@ public class Objects
             this.roomPrefix = cPrefix;
             this.rooms[0] = new room(dRooms, cPrefix, basePrice);
             this.reservations[0] = null;
-            this.dAvailableRooms = 1;
+            this.dRooms++;
+            this.dAvailableRooms++;
         }
         public double getEstimateEarning () {
             return estimateEarning;
@@ -57,16 +58,21 @@ public class Objects
             reservations[dIndex].getRoomNumber());
             return reservation;
         }
+        public boolean isRoomAvailable (String roomNumber) {
+            int dIndex = Integer.parseInt(roomNumber.substring(1));
+            return rooms[dIndex].isAvailable();
+        }
         public void addReservation (String name, String roomNumber, String checkInDate, String checkOutDate) {
             if (dReservations < constants.MAX_RESERVATIONS) {
                 dReservations++;
-                int dIndex = Integer.parseInt(roomNumber.substring(1)) - 1;
+                int dIndex = Integer.parseInt(roomNumber.substring(1));
                 reservations[dIndex] = new reservation(name, roomNumber, checkInDate, checkOutDate, basePrice);
                 rooms[dIndex].addReservation(name, checkInDate, checkOutDate, basePrice);
                 System.out.printf ("Reservation for %s has been added\n", name);
                 this.estimateEarning += rooms[dIndex].getReservationTotalAmount();
                 this.bookedRooms[dIndex] = rooms[dIndex];
                 this.dBookedRooms++;
+                this.dAvailableRooms--;
                 this.availableRooms[dIndex] = null;
             } else {
                 System.out.printf("Maximum number of reservations reached for %s\n", name);
@@ -75,7 +81,7 @@ public class Objects
         public void removeReservation (String name, String roomNumber) {
             if (dReservations > 0) {
                 dReservations--;
-                int dIndex = Integer.parseInt(roomNumber.substring(1)) - 1;
+                int dIndex = Integer.parseInt(roomNumber.substring(1));
                 reservations[dIndex] = null;
                 System.out.printf ("Reservation for %s has been removed\n", name);
                 this.bookedRooms[dIndex] = null;
@@ -115,7 +121,7 @@ public class Objects
             return dBookedRooms;
         }
         public void viewRoomInfo (String roomNumber, String Month) { // Month is spelled out
-            int dIndex = Integer.parseInt(roomNumber.substring(1)) - 1;
+            int dIndex = Integer.parseInt(roomNumber.substring(1));
             String availability = rooms[dIndex].isAvailable() ? "available this " + Month : "not available on ";
             String reservedDate = rooms[dIndex].getReservationCheckInDate() + " - " + rooms[dIndex].getReservationCheckOutDate();
             String reservationDate = rooms[dIndex].isAvailable() ? " " : reservedDate;
@@ -123,7 +129,7 @@ public class Objects
             rooms[dIndex].getRoomNumber(), 
             availability, 
             reservationDate);
-            System.out.printf ("Price per night: ₱%.2f\n", basePrice);
+            System.out.printf ("Price per night: %.2f\n", rooms[dIndex].getBasePrice());
             if (!rooms[dIndex].isAvailable()) {
                 System.out.printf ("Reservation name: %s\n", rooms[dIndex].getReservationName());
                 System.out.printf ("Check-in date: %s\n", rooms[dIndex].getReservationCheckInDate());
@@ -132,29 +138,33 @@ public class Objects
             }
         }
         public void viewReservationInfo (String roomNumber, String name) {
-            int dIndex = Integer.parseInt(roomNumber.substring(1)) - 1;
+            int dIndex = Integer.parseInt(roomNumber.substring(1));
             if (rooms[dIndex].getReservationName().equals(name)) {
                 viewRoomInfo(roomNumber,  "");
             } else {
                 System.out.printf ("No reservation found for this room number %s or %s\n", roomNumber, name);
             }
         }
-        public void addRoom (){
+        public void addRoom (int dIndex){
             if (dRooms < constants.MAX_ROOMS) {
-                dRooms++;
-                rooms[dRooms] = new room(dRooms, roomPrefix, 1299);
-                System.out.printf ("Room %s has been added\n", rooms[dRooms].getRoomNumber());
+                this.rooms[dIndex] = new room(dIndex, roomPrefix, 1299);
+                this.dRooms++;
+                this.dAvailableRooms++;
+                this.availableRooms[dIndex] = rooms[dIndex];
+                System.out.printf ("Room %s has been added\n", rooms[dIndex].getRoomNumber());
             } else {
                 System.out.printf("Maximum number of rooms reached for %s\n", name);
             }
         }
         public void removeRoom (String roomNumber){
-            int dIndex = Integer.parseInt(roomNumber.substring(1)) - 1;            
+            int dIndex = Integer.parseInt(roomNumber.substring(1));            
 
             if (dRooms > 1) {
                 if (rooms[dIndex].isAvailable){
-                    dRooms--;
-                    rooms[dIndex] = null;
+                    this.rooms[dIndex] = null;
+                    this.dAvailableRooms--;
+                    this.availableRooms[dIndex] = null;
+                    this.dRooms--;
                     System.out.printf ("Room %s has been removed\n", roomNumber);
                 } else {
                     System.out.printf ("Room %s is currently being used\n", roomNumber);
@@ -164,10 +174,10 @@ public class Objects
             }
         }
         public void changeRoomPrice (String roomNumber, double newBasePrice) {
-            int dIndex = Integer.parseInt(roomNumber.substring(1)) - 1;
+            int dIndex = Integer.parseInt(roomNumber.substring(1));
             if (rooms[dIndex].isAvailable) {
                 if (newBasePrice >= 100) {
-                    rooms[dIndex].setBasePrice(newBasePrice);
+                    this.rooms[dIndex].setBasePrice(newBasePrice);
                     System.out.printf ("Room %s price has been changed to %.2f\n", roomNumber, rooms[dIndex].getBasePrice());
                 } else {
                     System.out.printf ("Invalid price for room %s\n", roomNumber);
@@ -180,7 +190,13 @@ public class Objects
             return dRooms;
         }
         public String getRoomNumber (int dIndex) {
-            return rooms[dIndex].getRoomNumber();
+            String roomNumber = null;
+            if (rooms[dIndex] == null) {
+                roomNumber = null;
+            } else {
+                roomNumber = rooms[dIndex].getRoomNumber();
+            }
+            return roomNumber;
         }
 
         private class room

@@ -20,7 +20,7 @@ public class Main
             "2.View Hotel",
             "3.Manage Hotel",
             "4.Book Room",
-            "5.Exit Program",
+            "0.Exit Program",
             "Number of your choice:");
             dMenuInput = userInput.nextInt();
             userInput.nextLine(); // Consume the newline character left by nextInt()
@@ -50,14 +50,14 @@ public class Main
                         methods.bookRoom(hotels, userInput);
                     }
                     break;
-                case 5:
+                case 0:
                     System.out.println("Now exiting program");
                     break;
                 default:
                     System.out.println("Out of range input");
                 
             }
-	    }while(dMenuInput!=5);
+	    }while(dMenuInput!=0);
         userInput.close();
 	}
 }

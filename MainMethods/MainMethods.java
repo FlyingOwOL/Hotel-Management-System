@@ -36,9 +36,9 @@ public class MainMethods {
 
     public void viewHotel (ArrayList <Objects.Hotel> hotels, Scanner userInput){
         int dChoice = 0;
-        double dTotalEarning = 0;
-        int dTotalRooms = 0;
         do{
+            int dTotalRooms = 0;
+            double dTotalEarning = 0;
             System.out.println ("Select a hotel to view more details:");
             System.out.printf ("%3s +----- %10s -----+ %5s + %17s\n", "No.", "Hotel Name", "Rooms", "Estimated Earning");
             for (int i = 0; i < hotels.size(); i++){
@@ -91,6 +91,30 @@ public class MainMethods {
     }
 
     public void bookRoom (ArrayList <Objects.Hotel> hotels, Scanner userInput){
-
+        int dChoice = 0;
+        do{
+            System.out.println ("Select a hotel to book a room:");
+            System.out.printf ("%3s +----- %10s -----+\n", "No.", "Hotel Name");
+            for (int i = 0; i < hotels.size(); i++){
+                System.out.printf ("%2d. | %20s |\n", 
+                i + 1,  
+                hotels.get(i).getName());
+            }
+            System.out.println ("----+----------------------+");
+            System.out.println (" 0. Exit to main menu");
+            System.out.print ("Enter your choice: ");
+            dChoice = userInput.nextInt();
+            userInput.nextLine(); // Consume the newline character
+            if (dChoice > 0 && dChoice <= hotels.size()){
+                if (hotels.get(dChoice - 1).getTotaldReservations() < Objects.constants.MAX_RESERVATIONS) {
+                    AssistMethods.makeReservation(hotels.get(dChoice - 1), userInput);
+                } else {
+                    System.out.println ("Hotel " + hotels.get(dChoice - 1).getName() + " has reached the maximum number of reservations.");
+                }
+            } else {
+                System.out.println ("Out of range option");
+            }
+        } while (dChoice != 0);
+        System.out.println ("Returning to main menu");
     }
 }
